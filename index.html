@@ -236,7 +236,7 @@ const THEMES={
 const P=(name,mode,prep,work,rest,rounds,cycles,cycleRest)=>({id:'p'+Math.random().toString(36).slice(2,8),name,mode,prep,work,rest,rounds,cycles:cycles||1,cycleRest:cycleRest||0});
 const DEF={
  brand:{name:'A.R.D.O. ARTES MARCIAIS',logo:'',colors:{...THEMES['A.R.D.O.']}},
- sound:{on:true,vol:.8,vibrate:true,countdown:true,start:'sino3',end:'buzina',finish:'final'},
+ sound:{on:true,vol:.8,vibrate:true,countdown:true,start:'sino3',end:'bip2',finish:'final',v:2},
  tabata:{prep:0,work:180,rest:50,rounds:6,cycles:1,cycleRest:0},
  rounds:{prep:10,work:300,rest:60,rounds:5,cycles:1,cycleRest:0},
  countdown:{work:300},
@@ -250,8 +250,9 @@ const DEF={
 let S=load();
 function load(){let o={};try{o=JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){}
  const b=o.brand||{};
+ const so={...DEF.sound,...(o.sound||{})};if((o.sound||{}).v!==2){so.end='bip2';so.v=2}
  return{brand:{...DEF.brand,...b,colors:{...DEF.brand.colors,...(b.colors||{})}},
-  sound:{...DEF.sound,...(o.sound||{})},tabata:{...DEF.tabata,...(o.tabata||{})},rounds:{...DEF.rounds,...(o.rounds||{})},
+  sound:so,tabata:{...DEF.tabata,...(o.tabata||{})},rounds:{...DEF.rounds,...(o.rounds||{})},
   countdown:{...DEF.countdown,...(o.countdown||{})},presets:Array.isArray(o.presets)?o.presets:DEF.presets()}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 function h(t,a,...c){const e=document.createElement(t);for(const k in (a||{})){const v=a[k];if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}
@@ -281,6 +282,7 @@ function osc(type,f,t,d,v,dest){const o=ac.createOscillator(),g=ac.createGain();
 function strike(t,f,len,v){[[1,1],[2.4,.5],[3.9,.3],[5.4,.18]].forEach(([m,a])=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f*m;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*a,t+.005);g.gain.exponentialRampToValueAtTime(.0008,t+len);o.connect(g);g.connect(out());o.start(t);o.stop(t+len+.05)})}
 function lp(f){const x=ac.createBiquadFilter();x.type='lowpass';x.frequency.value=f;x.connect(out());return x}
 const SOUNDS={
+ bip2:{n:'Bipe forte (2 segundos)',p:(t,v)=>osc('square',880,t,2,Math.min(1,v*.8))},
  sino3:{n:'Sino de luta (3 batidas)',p:(t,v)=>{for(let k=0;k<3;k++)strike(t+k*.42,830,1.4,v)}},
  sino1:{n:'Sino único',p:(t,v)=>strike(t,830,2.2,v)},
  buzina:{n:'Buzina grave',p:(t,v)=>{[220,223].forEach(f=>osc('sawtooth',f,t,1.1,v*.38));osc('sawtooth',440,t,1.1,v*.18)}},
