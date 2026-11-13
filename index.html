@@ -150,7 +150,7 @@ input[type=range]{width:100%}
 .ltt{font-size:8.5vh;opacity:.8}
 .lph{font-size:12.5vh;flex:1;overflow:hidden;text-overflow:ellipsis}
 #lbig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#lTime{line-height:.8;white-space:nowrap;font-variant-numeric:tabular-nums;display:inline-block}
+#lTime{line-height:1;letter-spacing:0;white-space:nowrap;font-variant-numeric:tabular-nums;display:inline-block}
 .lbt{display:flex;align-items:stretch;height:14vh;font-size:9.5vh;white-space:nowrap}
 .lbt>span{display:flex;align-items:center}
 .lbt .bx{background:#0d0d0d;color:var(--work);padding:0 2.4vw;font-size:12vh;border-top-right-radius:1.2vh}
@@ -334,9 +334,17 @@ const ICON_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4"
 /* ---- layout deitado ---- */
 let fitKey='';
 function fitBig(force){const box=$('#lbig'),el=$('#lTime');if(!box||!box.clientWidth)return;
- const k=box.clientWidth+'x'+box.clientHeight+':'+el.textContent.length;if(!force&&k===fitKey)return;fitKey=k;
- el.style.fontSize='100px';const w=el.offsetWidth,hh=el.offsetHeight;if(!w||!hh)return;
- el.style.fontSize=Math.floor(Math.min(box.clientWidth*.97/w,box.clientHeight*.98/hh)*100)+'px'}
+ const txt=el.textContent,k=box.clientWidth+'x'+box.clientHeight+':'+txt.length+':'+(document.fonts?document.fonts.status:'');
+ if(!force&&k===fitKey)return;fitKey=k;
+ /* mede o desenho real dos números (não a caixa do texto) para centralizar de verdade */
+ const c=fitBig.c||(fitBig.c=document.createElement('canvas').getContext('2d'));
+ c.font='100px '+getComputedStyle(el).fontFamily;
+ const m=c.measureText(txt.replace(/\d/g,'8')),asc=m.actualBoundingBoxAscent,desc=m.actualBoundingBoxDescent,
+  L=m.actualBoundingBoxLeft,R=m.actualBoundingBoxRight,inkW=L+R,inkH=asc+desc;if(!inkW||!inkH)return;
+ const F=Math.floor(Math.min(box.clientWidth*.96/inkW,box.clientHeight*.90/inkH)*100),f=F/100;
+ const fa=m.fontBoundingBoxAscent,fd=m.fontBoundingBoxDescent;
+ const ty=(fa==null||fd==null)?0:f*((asc-desc)-(fa-fd))/2,tx=f*(m.width-(R-L))/2;
+ el.style.fontSize=F+'px';el.style.transform='translate('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px)'}
 addEventListener('resize',()=>fitBig(true));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitBig(true));
 function renderLand(phase,time,nextTxt,hasNext,rounds,cyc){
