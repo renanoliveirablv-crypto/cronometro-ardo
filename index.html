@@ -236,7 +236,7 @@ const THEMES={
 const P=(name,mode,prep,work,rest,rounds,cycles,cycleRest)=>({id:'p'+Math.random().toString(36).slice(2,8),name,mode,prep,work,rest,rounds,cycles:cycles||1,cycleRest:cycleRest||0});
 const DEF={
  brand:{name:'A.R.D.O. ARTES MARCIAIS',logo:'',colors:{...THEMES['A.R.D.O.']}},
- sound:{on:true,vol:.8,vibrate:true,countdown:true,start:'sino3',end:'bip2',finish:'final',v:2},
+ sound:{on:true,vol:.8,vibrate:true,countdown:true,start:'sino3',end:'bipF',finish:'final',v:3},
  tabata:{prep:0,work:180,rest:50,rounds:6,cycles:1,cycleRest:0},
  rounds:{prep:10,work:300,rest:60,rounds:5,cycles:1,cycleRest:0},
  countdown:{work:300},
@@ -250,7 +250,7 @@ const DEF={
 let S=load();
 function load(){let o={};try{o=JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){}
  const b=o.brand||{};
- const so={...DEF.sound,...(o.sound||{})};if((o.sound||{}).v!==2){so.end='bip2';so.v=2}
+ const so={...DEF.sound,...(o.sound||{})};if((o.sound||{}).v!==3){so.end='bipF';so.v=3}
  return{brand:{...DEF.brand,...b,colors:{...DEF.brand.colors,...(b.colors||{})}},
   sound:so,tabata:{...DEF.tabata,...(o.tabata||{})},rounds:{...DEF.rounds,...(o.rounds||{})},
   countdown:{...DEF.countdown,...(o.countdown||{})},presets:Array.isArray(o.presets)?o.presets:DEF.presets()}}
@@ -283,11 +283,11 @@ function strike(t,f,len,v){[[1,1],[2.4,.5],[3.9,.3],[5.4,.18]].forEach(([m,a])=>
 function lp(f){const x=ac.createBiquadFilter();x.type='lowpass';x.frequency.value=f;x.connect(out());return x}
 const SOUNDS={
  bipA:{n:'Bipe 1 — agudo (1,2 s)',p:(t,v)=>osc('square',1500,t,1.2,Math.min(1,v*.7))},
- bip2:{n:'Bipe 2 — médio (1,2 s) • atual',p:(t,v)=>osc('square',880,t,1.2,Math.min(1,v*.8))},
+ bip2:{n:'Bipe 2 — médio (1,2 s)',p:(t,v)=>osc('square',880,t,1.2,Math.min(1,v*.8))},
  bipC:{n:'Bipe 3 — grave (1,2 s)',p:(t,v)=>osc('square',500,t,1.2,Math.min(1,v*.9))},
  bipD:{n:'Bipe 4 — buzzer digital (1,2 s)',p:(t,v)=>{const f=lp(4000);osc('sawtooth',1000,t,1.2,Math.min(1,v*.5),f)}},
  bipE:{n:'Bipe 5 — pulsado (1,2 s)',p:(t,v)=>{for(let k=0;k<6;k++)osc('square',1000,t+k*.2,.12,Math.min(1,v*.75))}},
- bipF:{n:'Bipe 6 — suave (1,2 s)',p:(t,v)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=1000;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.8,t+.03);g.gain.setValueAtTime(v*.8,t+.95);g.gain.linearRampToValueAtTime(0,t+1.2);o.connect(g);g.connect(out());o.start(t);o.stop(t+1.25)}},
+ bipF:{n:'Bipe 6 — suave (1,2 s) • padrão',p:(t,v)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=1000;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.8,t+.03);g.gain.setValueAtTime(v*.8,t+.95);g.gain.linearRampToValueAtTime(0,t+1.2);o.connect(g);g.connect(out());o.start(t);o.stop(t+1.25)}},
  bipG:{n:'Bipe 7 — suave duplo (1,2 s)',p:(t,v)=>{[0,.62].forEach(s=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0,t+s);g.gain.linearRampToValueAtTime(v*.8,t+s+.02);g.gain.setValueAtTime(v*.8,t+s+.4);g.gain.linearRampToValueAtTime(0,t+s+.55);o.connect(g);g.connect(out());o.start(t+s);o.stop(t+s+.6)})}},
  bipH:{n:'Bipe 8 — suave descendente (1,2 s)',p:(t,v)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.setValueAtTime(1200,t);o.frequency.exponentialRampToValueAtTime(600,t+1.2);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.85,t+.03);g.gain.setValueAtTime(v*.85,t+.9);g.gain.linearRampToValueAtTime(0,t+1.2);o.connect(g);g.connect(out());o.start(t);o.stop(t+1.25)}},
  sino3:{n:'Sino de luta (3 batidas)',p:(t,v)=>{for(let k=0;k<3;k++)strike(t+k*.42,830,1.4,v)}},
